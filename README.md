@@ -100,8 +100,9 @@ Make sure your `.env` file is included in `.gitignore`:
 ---
 
 ## 🌐 Deployment
+try this link to view my website
 
-Coming soon... (or add the link here if deployed already, like👇)
+[Coming soon... (or add the link here if deployed already, like👇)](https://vidgist-f1nh.onrender.com)
 
 🔗 Live App
 
