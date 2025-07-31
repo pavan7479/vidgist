@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Video Explainer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #f9f9fb;
+      --primary: #007bff;
+      --text: #222;
+      --light: #f1f3f5;
+      --code-bg: #f8f9fa;
+      --code-border: #e9ecef;
+      --syntax-comment: #6c757d;
+      --syntax-keyword: #d73a49;
+      --syntax-string: #032f62;
+      --syntax-number: #005cc5;
+    }
+
+    body {
+      background-color: var(--bg);
+      font-family: "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 30px;
+    }
+
+    form label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 600;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px 25px;
+      font-size: 16px;
+      color: white;
+      background-color: var(--primary);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .error {
+      color: red;
+      margin-top: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .result {
+      margin-top: 40px;
+    }
+
+    .result h1, .result h2, .result h3, .result h4, .result h5, .result h6 {
+      margin-top: 2em;
+      margin-bottom: 0.8em;
+      color: #333;
+    }
+
+    .result h1 { font-size: 2.2em; }
+    .result h2 { font-size: 1.8em; color: var(--primary); }
+    .result h3 { font-size: 1.5em; color: #444; }
+    .result h4 { font-size: 1.3em; color: #555; }
+
+    .result p {
+      margin: 12px 0;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .result ul, .result ol {
+      margin: 16px 0;
+      padding-left: 24px;
+    }
+
+    .result li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    /* Enhanced Code Block Styling */
+    .result pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .result pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #333;
+      display: block;
+      white-space: pre;
+      overflow-wrap: normal;
+    }
+
+    /* Inline code styling */
+    .result code {
+      background-color: #f1f3f4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.9em;
+      color: #d73a49;
+      border: 1px solid #e1e4e8;
+    }
+
+    /* Syntax highlighting for common languages */
+    .highlight {
+      background: var(--code-bg);
+    }
+
+    .highlight .c { color: var(--syntax-comment); font-style: italic; } /* Comment */
+    .highlight .k { color: var(--syntax-keyword); font-weight: bold; } /* Keyword */
+    .highlight .s { color: var(--syntax-string); } /* String */
+    .highlight .m { color: var(--syntax-number); } /* Number */
+    .highlight .n { color: #333; } /* Name */
+    .highlight .o { color: #666; } /* Operator */
+    .highlight .p { color: #666; } /* Punctuation */
+
+    /* Language label for code blocks */
+    .result pre::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: #e9ecef;
+      color: #495057;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    /* Blockquote styling */
+    .result blockquote {
+      border-left: 4px solid var(--primary);
+      margin: 20px 0;
+      padding: 16px 20px;
+      background: #f8f9fa;
+      border-radius: 0 6px 6px 0;
+      font-style: italic;
+      color: #495057;
+    }
+
+    /* Table styling */
+    .result table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .result th, .result td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .result th {
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .result tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+
+    /* Copy button for code blocks */
+    .code-block-wrapper {
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 50px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .copy-btn:hover {
+      opacity: 1;
+      background: #495057;
+    }
+
+    /* Mobile responsiveness */
+    @media screen and (max-width: 768px) {
+      .container {
+        padding: 20px 10px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .result pre {
+        padding: 15px;
+        font-size: 13px;
+      }
+
+      .result pre code {
+        font-size: 13px;
+      }
+
+      .result h1 { font-size: 1.8em; }
+      .result h2 { font-size: 1.5em; }
+      .result h3 { font-size: 1.3em; }
+      
+      .copy-btn {
+        position: static;
+        margin-bottom: 10px;
+        display: block;
+        width: fit-content;
+      }
+    }
+
+    /* Loading indicator */
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      color: var(--primary);
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🎥 AI-Powered YouTube Video Explainer</h1>
+      <form method="post" id="explainerForm">
+        <label for="video_url">YouTube Video URL:</label>
+        <input type="text" name="video_url" id="video_url"  autocomplete="off" required 
+               placeholder="https://www.youtube.com/watch?v=...">
+
+        <label for="output_type">Select Output Type:</label>
+        <select name="output_type" id="output_type">
+          <option value="explanation">Detailed Explanation</option>
+          <option value="summary">Summary</option>
+          <option value="revision">Revision Notes</option>
+        </select>
+
+        <button type="submit">Generate ✨</button>
+      </form>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        Processing your video... This may take a few moments.
+      </div>
+
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+
+      {% if result %}
+        <div class="result">
+          {{ result | safe }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    // Add loading indicator
+    document.getElementById('explainerForm').addEventListener('submit', function() {
+      document.getElementById('loading').classList.add('show');
+    });
+
+    // Add copy functionality to code blocks
+    document.addEventListener('DOMContentLoaded', function() {
+      const codeBlocks = document.querySelectorAll('pre code');
+      codeBlocks.forEach(function(codeBlock) {
+        const pre = codeBlock.parentElement;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = function() {
+          navigator.clipboard.writeText(codeBlock.textContent).then(function() {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(function() {
+              copyBtn.textContent = 'Copy';
+            }, 2000);
+          });
+        };
+        wrapper.appendChild(copyBtn);
+      });
+    });
+
+    // Auto-detect and add language labels to code blocks
+    document.addEventListener('DOMContentLoaded', function() {
+      const preElements = document.querySelectorAll('pre');
+      preElements.forEach(function(pre) {
+        const code = pre.querySelector('code');
+        if (code && code.className) {
+          const langMatch = code.className.match(/language-(\w+)/);
+          if (langMatch) {
+            pre.setAttribute('data-lang', langMatch[1]);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
